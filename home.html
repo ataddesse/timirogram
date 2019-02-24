@@ -1,0 +1,621 @@
+<?php include ("./inc/header.inc.php"); 
+ include ("./inc/connect.inc.php");
+
+
+
+?>
+<div id = "wrap">
+
+<?php 
+$check = mysql_query("SELECT grade FROM susers WHERE user_name = '$user_name' ");
+   if (mysql_num_rows($check)===1){
+    $get = mysql_fetch_assoc($check);
+  // Checking which grade the user is in
+    $grade = $get['grade'];
+    
+  
+  }
+  //Check whether the user has uploaded a profile picture or not
+$check_pic = mysql_query("SELECT user_pic FROM susers where user_name='$user_name'");
+$get_pic_row = mysql_fetch_assoc($check_pic);
+$profile_pic_db = $get_pic_row['user_pic'];
+if($profile_pic_db == "") {
+$profile_pic = "./img/default_pic.jpg";
+}else{
+$profile_pic = "userdata/profile_pics/".$profile_pic_db; 
+}
+?>
+
+
+<?php 
+// Get on what position the user is
+$check = mysql_query("SELECT position FROM susers WHERE user_name = '$user_name' ");
+   if (mysql_num_rows($check)===1){
+    $get = mysql_fetch_assoc($check);
+  
+    $position = $get['position'];
+
+    $_SESSION['position']=$position;
+  }
+?>
+<?php 
+// Get the first and last name of the user
+$check = mysql_query("SELECT f_name FROM susers WHERE user_name = '$user_name' ");
+   if (mysql_num_rows($check)===1){
+    $get = mysql_fetch_assoc($check);
+  
+    $f_name = $get['f_name'];
+  }
+?>
+<?php 
+// Get the first and last name of the user
+$check = mysql_query("SELECT l_name FROM susers WHERE user_name = '$user_name' ");
+   if (mysql_num_rows($check)===1){
+    $get = mysql_fetch_assoc($check);
+  
+    $l_name = $get['l_name'];
+  }
+?>
+<?php include ("send_post.php"); ?>
+<?php
+if(isset($_POST['follow'])){
+    $follow_request = $_POST['follow'];
+    $user_to = $user_name;
+}
+else
+ 
+{
+
+}
+// Things to do counter
+$get_math_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='math'");
+  $get_math = mysql_fetch_assoc($get_math_query);
+  $count_undone_math = mysql_num_rows($get_math_query);
+
+$get_ela_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='ELA'");
+  $get_ela = mysql_fetch_assoc($get_ela_query);
+  $count_undone_ela = mysql_num_rows($get_ela_query);
+$get_chemistry_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='chemistry'");
+  $get_chemistry = mysql_fetch_assoc($get_chemistry_query);
+  $count_undone_chemistry = mysql_num_rows($get_chemistry_query);
+$get_physics_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='physics'");
+  $get_physics = mysql_fetch_assoc($get_physics_query);
+  $count_undone_physics = mysql_num_rows($get_physics_query);
+$get_amharic_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='amharic'");
+  $get_amharic = mysql_fetch_assoc($get_amharic_query);
+  $count_undone_amharic = mysql_num_rows($get_amharic_query);
+$get_btd_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='B.T.D'");
+  $get_btd = mysql_fetch_assoc($get_btd_query);
+  $count_undone_btd = mysql_num_rows($get_btd_query);  
+$get_bio_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='biology'");
+  $get_bio = mysql_fetch_assoc($get_bio_query);
+  $count_undone_bio = mysql_num_rows($get_bio_query);   
+$get_civics_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='civics'");
+  $get_civics = mysql_fetch_assoc($get_civics_query);
+  $count_undone_civics = mysql_num_rows($get_civics_query);         
+$get_ict_query = mysql_query("SELECT subject from posts where for_grade = '$grade' && subject='ICT'");
+  $get_ict = mysql_fetch_assoc($get_ict_query);
+  $count_undone_ict = mysql_num_rows($get_ict_query);
+
+
+
+?>
+
+<?php 
+if($position=="principal"){
+  if (isset($_POST['schedule'])){
+// Declare variable for the meeting scheduling form
+  $for_grade = $_POST['select_grade'];
+  $date_added = date('d-m-y');
+    $place = $_POST['place'];
+$date = $_POST['date'];
+$time = $_POST['time'];
+$reason = $_POST['reason'];
+// Send it to the database
+$run = mysql_query("INSERT into meeting VALUES('','$date_added','$user_name','$for_grade','$place','$date','$time','$reason','no')");
+}
+else{
+echo "Error";
+}
+
+
+
+echo "
+<div class='well'><img src='$profile_pic' height='150' width='150' /></div></br> Welcome to teachgram ".$user_name ."....
+  <div class='panel panel-info'><div class='panel-heading'>
+  <h3 class='panel-title'>Schedule a meeting below</h3></div>
+  <div class='wrap'>
+  <form action='home.php'  method='post'  class='form-horizontal'><fieldset>
+      <label for='select' class='col-lg-2 control-label'>For Grade:</label>
+  <select class='form-control' name='select_grade'>
+  <option>Everyone</option>
+  <option>All teachers</option>
+  <option>Physics teachers</option>
+  <option>Math teachers</option>
+  <option>All students</option>
+  <option>11<sup>th</sup> grade students</option>
+  <option>12<sup>th</sup> grade students</option>
+  </select></p>
+<input type='text' name='place' size='70' class='form-control' placeholder='Place'></p>
+<input type='text' name='date' size='70' class='form-control' placeholder='Date'></p>
+<input type='text' name='time' size='70' class='form-control' placeholder='Time'></p>
+<textarea class='form-control' name='reason'   rows='4' cols='58' id='textArea'></textarea>
+<input type='submit' name='schedule' value='SCHEDULE'    class='btn btn-primary' placeholder='SCHEDULE'></fieldset>
+  </form>
+</div></div>
+
+  <div class='panel panel-info'><div class='panel-heading'>
+  <h3 class='panel-title'>Recieved lessonplans</h3></div> ";
+  // Grab lessonplan that are submitted by a teacher
+$grab_lessonplans = mysql_query("SELECT * FROM lessonplans where approved='no' ");
+$numrows = mysql_numrows($grab_lessonplans);
+if($numrows != 0) {
+while($get_lessonplans = mysql_fetch_assoc($grab_lessonplans)){
+  $id =$get_lessonplans['id'];
+  $from =$get_lessonplans['from'];
+  $subject =$get_lessonplans['subject'];
+  $grade =$get_lessonplans['grade'];
+   $date =$get_lessonplans['date_submitted'];
+    $m1 =$get_lessonplans['m1'];
+    $m2 =$get_lessonplans['m2'];
+    $m3 =$get_lessonplans['m3'];
+    $m4 =$get_lessonplans['m4'];
+    $m5 =$get_lessonplans['m5']; 
+        $m6 =$get_lessonplans['m6'];  
+      $tu1 =$get_lessonplans['tu1'];
+    $tu2 =$get_lessonplans['tu2'];
+    $tu3 =$get_lessonplans['tu3'];
+    $tu4 =$get_lessonplans['tu4'];
+    $tu5 =$get_lessonplans['tu5']; 
+        $tu6 =$get_lessonplans['tu6']; 
+      $w1 =$get_lessonplans['w1'];
+    $w2 =$get_lessonplans['w2'];
+    $w3 =$get_lessonplans['w3'];
+    $w4 =$get_lessonplans['w4'];
+    $w5 =$get_lessonplans['w5']; 
+        $w6 =$get_lessonplans['w6']; 
+      $th1 =$get_lessonplans['th1'];
+    $th2 =$get_lessonplans['th2'];
+    $th3 =$get_lessonplans['th3'];
+    $th4 =$get_lessonplans['th4'];
+    $th5 =$get_lessonplans['th5'];
+        $th6 =$get_lessonplans['th6'];
+      $f1 =$get_lessonplans['f1'];
+    $f2 =$get_lessonplans['f2'];
+    $f3 =$get_lessonplans['f3'];
+    $f4 =$get_lessonplans['f4'];
+    $f5 =$get_lessonplans['f5'];  
+        $f6 =$get_lessonplans['f6'];  
+    
+    ?>
+<script language="javascript">
+         function toggle<?php echo $id; ?> () {
+           var ele = document.getElementById("toggletext<?php echo $id ?>");
+           var text = document.getElementById("displaytext<?php echo $id ?>");
+           if (ele.style.display == "block") {
+              ele.style.display = "none";
+           }
+           else
+           {
+             ele.style.display = "block";
+           }
+         }
+</script>
+<?php
+  if (@$_POST['approved_' . $id. '']){
+
+$m1 =  @$_POST['m1'];
+$m2 =  @$_POST['m2'];
+$m3 =  @$_POST['m3'];
+$m4 =  @$_POST['m4'];
+$m5 =  @$_POST['m5'];
+$m6 =  @$_POST['m6'];
+
+$tu1 =  @$_POST['tu1'];
+$tu2 =  @$_POST['tu2'];
+$tu3 =  @$_POST['tu3'];
+$tu4 =  @$_POST['tu4'];
+$tu5 =  @$_POST['tu5'];
+$tu6 =  @$_POST['tu6'];
+
+$w1 =  @$_POST['w1'];
+$w2 =  @$_POST['w2'];
+$w3 =  @$_POST['w3'];
+$w4 =  @$_POST['w4'];
+$w5 =  @$_POST['w5'];
+$w6 =  @$_POST['w6'];
+
+$th1 =  @$_POST['th1'];
+$th2 =  @$_POST['th2'];
+$th3 =  @$_POST['th3'];
+$th4 =  @$_POST['th4'];
+$th5 =  @$_POST['th5'];
+$th6 =  @$_POST['th6'];
+
+$f1 =  @$_POST['f1'];
+$f2 =  @$_POST['f2'];
+$f3 =  @$_POST['f3'];
+$f4 =  @$_POST['f4'];
+$f5 =  @$_POST['f5'];
+$f6 =  @$_POST['f6'];
+
+$approve_query = mysql_query("UPDATE lessonplans SET approved='yes' where id = '$id'");
+
+  }
+
+  echo "
+   <form method='POST' action='home.php'>
+
+<input type='button' name='openmsg' value='$from- $subject- $grade ($date)' onclick = 'javascript:toggle$id()'>
+<input type='submit' name='approved_$id' value='Approve this lesson plan'  >
+</form>  
+<div id='toggletext$id' style='display:none;'>
+<div class='col-lg-10'><form action='home.php'  method='post' enctype='multipart/form-data'>
+  <h3>Edit a lesson plan here </h3>
+<form action='home.php'  method='post' enctype='multipart/form-data'>
+<table class='table table-striped table-hover '>
+<tr>
+<th>Day</th>
+<th>Contents</th>
+<th>Objective of contents</th>
+<th>Teacher's activity</th>
+<th>Students activities</th>
+<th>Teaching resources</th>
+<th>Assessment</th>
+</tr>
+<tr>
+<td><b>Monday</b></td>
+<td><input class='form-control input-lg' type='text' value='$m1' name='m1' value='$m1' id='m1'></td>
+
+<td><input class='form-control input-lg' type='text' name='m2' value='$m2' id='m2'></td>
+<td><input class='form-control input-lg' type='text' name='m3' value='$m3' id='m3'></td>
+<td><input class='form-control input-lg' type='text' name='m4' value='$m4' id='m4'></td>
+<td><input class='form-control input-lg' type='text' name='m5' value='$m5' id='m5'></td>
+<td><input class='form-control input-lg' type='text' name='m6' value='$m6' id='m6'></td>
+</tr>
+<tr>
+<td><b>Tuesday</b></td>
+<td><input class='form-control input-lg' type='text' name='tu1' value='$tu1' id='tu1'></td>
+<td><input class='form-control input-lg' type='text' name='tu2' value='$tu2' id='tu2'></td>
+<td><input class='form-control input-lg' type='text' name='tu3' value='$tu3' id='tu3'></td>
+<td><input class='form-control input-lg' type='text' name='tu4' value='$tu4' id='tu4'></td>
+<td><input class='form-control input-lg' type='text' name='tu5' value='$tu5' id='tu5'></td>
+<td><input class='form-control input-lg' type='text' name='tu6' value='$tu6' id='tu6'></td>
+</tr>
+<tr>
+<td><b>Wednsday</b></td>
+<td><input class='form-control input-lg' type='text' name='w1' value='$w1' id='w1'></td>
+<td><input class='form-control input-lg' type='text' name='w2' value='$w2' id='w2'></td>
+<td><input class='form-control input-lg' type='text' name='w3' value='$w3' id='w3'></td>
+<td><input class='form-control input-lg' type='text' name='w4' value='$w4' id='w4'></td>
+<td><input class='form-control input-lg' type='text' name='w5'  value='$w5' id='w5'></td>
+<td><input class='form-control input-lg' type='text' name='w6' value='$w6'  id='w6'></td>
+</tr>
+<tr>
+<td><b>Thursday</b></td>
+<td><input class='form-control input-lg' type='text' name='th1' value='$th1' id='th1'></td>
+<td><input class='form-control input-lg' type='text' name='th2' value='$th2' id='th2'></td>
+<td><input class='form-control input-lg' type='text' name='th3' value='$th3' id='th3'></td>
+<td><input class='form-control input-lg' type='text' name='th4' value='$th4' id='th4'></td>
+<td><input class='form-control input-lg' type='text' name='th5' value='$th5' id='th5'></td>
+<td><input class='form-control input-lg' type='text' name='th6' value='$th6' id='th6'></td>
+</tr>
+<tr>
+<td><b>Friday</b></td>
+<td><input class='form-control input-lg' type='text' name='f1' id='f1' value='$f1' ></td>
+<td><input class='form-control input-lg' type='text' name='f2' id='f2' value='$f2' ></td>
+<td><input class='form-control input-lg' type='text' name='f3' id='f3' value='$f3' ></td>
+<td><input class='form-control input-lg' type='text' name='f4' id='f4' value='$f4' ></td>
+<td><input class='form-control input-lg' type='text' name='f5' id='f5' value='$f5' ></td>
+<td><input class='form-control input-lg' type='text' name='f6' id='f6' value='$f6' ></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>  <input type='submit' name='approved_$id'   value='Approve'    class='btn btn-primary' placeholder='POST'></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</form> 
+</div>
+</div>
+ 
+
+";}}
+else{
+  echo "  </div> You haven't recieved any lessonplans yet";
+   }
+
+             }
+
+
+if($position=="student")  {
+    
+echo"
+<div class='well'><img src='$profile_pic' height='150' width='150' /></div></br> Welcome to teachgram ".$user_name ."....</td>
+	<td ><div class='panel panel-info'><div class='panel-heading'>
+	<h3 class='panel-title'>Things to Do</h3></div>
+		</br></br><ul class='nav nav-pills'>
+		  <li class='active'><a href='view_math.php'> Math <span class='badge'>$count_undone_math</span></a></li>
+          <li class='active'><a href='view_chemistry.php'> Chemistry <span class='badge'>$count_undone_chemistry</span></a></li>
+          <li class='active'><a href='view_ela.php'> ELA <span class='badge'>$count_undone_ela</span></a></li>
+          <li class='active'><a href='view_amharic.php'> Amharic <span class='badge'>$count_undone_amharic</span></a></li>
+          <li class='active'><a href='view_btd.php'> B.T.D <span class='badge'>$count_undone_btd</span></a></li>
+          <li class='active'><a href='view_physics.php'> Physics <span class='badge'$count_undone_physics</span></a></li>
+                <li class='active'><a href='view_civics.php'> Civics <span class='badge'>$count_undone_civics</span></a></li>
+                      <li class='active'><a href='view_ict.php'> ICT <span class='badge'>$count_undone_ict</span></a></li>
+                            <li class='active'><a href='view_bo.php'> Biology <span class='badge'>$count_undone_bio</span></a></li> 
+        </ul>	       
+</br></br>
+</div>
+	</td>
+</tr>
+<tr><td></td><td>
+<div class='panel panel-default'>
+  <div class='panel-heading'>Recent Posts</div>
+  <div class='panel-body'>";
+  // Get posts from the database
+$getposts = mysql_query("SELECT * FROM posts WHERE for_grade='$grade' ORDER BY id DESC LIMIT 10") ;
+while($row = mysql_fetch_assoc($getposts)){
+    $id = $row['id'];
+    $body = $row['body']; 
+    $date_added = $row['date_added'];
+    $added_by = $row['added_by'];
+    $user_posted_to = $row['for_grade'];
+    $attachment = $row['attachments'];
+// Get poster's pro_pic
+  $get_poster_pic = mysql_query("SELECT user_pic from susers where user_name = '$added_by'");
+  $get_pic_row = mysql_fetch_assoc($get_poster_pic);
+$profile_pic_db1 = $get_pic_row['user_pic'];
+if($profile_pic_db1 == "") {
+$profile_pic1 = "./img/default_pic.jpg";
+}else{
+$profile_pic1 = "userdata/profile_pics/".$profile_pic_db1; 
+}
+?>
+
+<script language="javascript">
+// Toggle function for comment box
+         function toggle<?php echo $id; ?> () {
+           var ele = document.getElementById("togglecomment<?php echo $id ?>");
+           var text = document.getElementById("displaycomment<?php echo $id ?>");
+           if (ele.style.display == "block") {
+              ele.style.display = "none";
+           }
+           else
+           {
+             ele.style.display = "block";
+           }
+         }
+</script>
+<?php
+
+    
+ echo "
+  
+  
+<table><tr><td><img src='$profile_pic1' height='90' width='90'></td></td><td><b>$added_by</b><p/>$body</br><small>$date_added </small></blockquote></br></td></tr></table>
+" ;
+
+if(strlen($attachment) > 6){
+  // If attachments exists
+  echo "<tr><td></td><td> $attachment
+  <a href='userdata/attachments/$attachment' download> <input type='submit' value='Download' class='btn btn-success' /> </a></td>
+
+</td></tr>
+  ";
+}
+else
+{
+  // do nothing
+}
+echo "  
+
+  <tr><td></td>
+  <td> <a href='#' onClick='javascript:toggle$id()'>Show Comments</a></td>
+  <td><div style='display: inline;'><iframe src='./like_frame.php?id=$id' frameborder='0' style='max-height: 100%; width: 100%; min-height: 25px;'></iframe></div></td> </tr>" ;
+  // Get relevant comment 
+  $get_comments = mysql_query("SELECT * from post_comments where post_id = $id");
+  while($comment = mysql_fetch_assoc($get_comments)){
+   $comment_body = $comment['body'];
+    $posted_to = $comment['posted_to'];
+    $posted_by = $comment['posted_by'];
+    $removed = $comment['post_removed'];
+?>
+
+
+<?php
+    echo "<tr><td></td><td><div class='well well-lg' id='togglecomment$id' style='display:none;'>
+<iframe src='./comment_frame.php?id=$id' frameborder='0' style='max-height: 150px; width: 500px; min-height: 10px;'></iframe>
+</div></td></tr>";
+      }
+  ?>
+
+  
+<?php
+
+
+echo "</table></br><hr/></br>"; 
+ } 
+
+}
+
+
+ echo "
+</div></div>
+</td>
+	
+</tr>
+</table>
+
+";
+if ($position=='teacher'){
+  echo"
+<div class='well'><img src='$profile_pic' height='150' width='150' /></div></br> Welcome to teachgram $user_name...
+
+
+  <h3>Post here</h3>
+     <div class='col-lg-10'><form action='home.php'  method='post' enctype='multipart/form-data'>
+ <textarea class='form-control' name='post'   rows='4' cols='58' id='textArea'></textarea>
+  <label for='select' class='col-lg-2 control-label'>For Grade:</label>
+  <select class='form-control' name='select_grade'>
+  <option>9</option>
+  <option>10</option>
+  <option>11</option>
+  <option>12</option>
+  
+  </select>
+";
+ 
+
+
+
+
+ echo "
+
+
+
+<input type='file' name='file'></br>
+   <input type='submit' name='send'  onclick='javascript:send_post()' value='Post'    class='btn btn-primary' placeholder='POST'>
+  </form>
+
+
+</div>
+  ";
+
+  echo " <div class='col-lg-10'><form action='home.php'  method='post' enctype='multipart/form-data'>
+  <h3>Submit a lesson plan here </h3>
+ 
+<form action='home.php'  method='post' enctype='multipart/form-data'>
+<table class='table table-striped table-hover '>
+<tr>
+<th>Day</th>
+<th>Contents</th>
+<th>Objective of contents</th>
+<th>Teacher's activity</th>
+<th>Students activities</th>
+<th>Teaching resources</th>
+<th>Assessment</th>
+</tr>
+<tr>
+<td><b>Monday</b></td>
+<td><input class='form-control input-lg' type='text' value='$m1' name='m1' id='m1'></td>
+
+<td><input class='form-control input-lg' type='text' name='m2' id='m2'></td>
+<td><input class='form-control input-lg' type='text' name='m3' id='m3'></td>
+<td><input class='form-control input-lg' type='text' name='m4' id='m4'></td>
+<td><input class='form-control input-lg' type='text' name='m5' id='m5'></td>
+<td><input class='form-control input-lg' type='text' name='m6' id='m6'></td>
+</tr>
+<tr>
+<td><b>Tuesday</b></td>
+<td><input class='form-control input-lg' type='text' name='tu1' id='tu1'></td>
+<td><input class='form-control input-lg' type='text' name='tu2' id='tu2'></td>
+<td><input class='form-control input-lg' type='text' name='tu3' id='tu3'></td>
+<td><input class='form-control input-lg' type='text' name='tu4' id='tu4'></td>
+<td><input class='form-control input-lg' type='text' name='tu5' id='tu5'></td>
+<td><input class='form-control input-lg' type='text' name='tu6' id='tu6'></td>
+</tr>
+<tr>
+<td><b>Wednsday</b></td>
+<td><input class='form-control input-lg' type='text' name='w1' id='w1'></td>
+<td><input class='form-control input-lg' type='text' name='w2' id='w2'></td>
+<td><input class='form-control input-lg' type='text' name='w3' id='w3'></td>
+<td><input class='form-control input-lg' type='text' name='w4' id='w4'></td>
+<td><input class='form-control input-lg' type='text' name='w5' id='w5'></td>
+<td><input class='form-control input-lg' type='text' name='w6' id='w6'></td>
+</tr>
+<tr>
+<td><b>Thursday</b></td>
+<td><input class='form-control input-lg' type='text' name='th1' id='th1'></td>
+
+<td><input class='form-control input-lg' type='text' name='th2' id='th2'></td>
+<td><input class='form-control input-lg' type='text' name='th3' id='th3'></td>
+<td><input class='form-control input-lg' type='text' name='th4' id='th4'></td>
+<td><input class='form-control input-lg' type='text' name='th5' id='th5'></td>
+<td><input class='form-control input-lg' type='text' name='th6' id='th6'></td>
+</tr>
+<tr>
+<td><b>Friday</b></td>
+<td><input class='form-control input-lg' type='text' name='f1' id='f1'></td>
+<td><input class='form-control input-lg' type='text' name='f2' id='f2'></td>
+<td><input class='form-control input-lg' type='text' name='f3' id='f3'></td>
+<td><input class='form-control input-lg' type='text' name='f4' id='f4'></td>
+<td><input class='form-control input-lg' type='text' name='f5' id='f5'></td>
+<td><input class='form-control input-lg' type='text' name='f6' id='f6'></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>  <input type='submit' name='submit'   value='Submit'    class='btn btn-primary' placeholder='POST'></td>
+<td></td>
+<td></td>
+</tr>
+</table>
+</form> 
+
+  ";
+
+
+
+if (isset($_POST['submit'])){
+
+$m1 =  @$_POST['m1'];
+$m2 =  @$_POST['m2'];
+$m3 =  @$_POST['m3'];
+$m4 =  @$_POST['m4'];
+$m5 =  @$_POST['m5'];
+$m6 =  @$_POST['m6'];
+
+$tu1 =  @$_POST['tu1'];
+$tu2 =  @$_POST['tu2'];
+$tu3 =  @$_POST['tu3'];
+$tu4 =  @$_POST['tu4'];
+$tu5 =  @$_POST['tu5'];
+$tu6 =  @$_POST['tu6'];
+
+$w1 =  @$_POST['w1'];
+$w2 =  @$_POST['w2'];
+$w3 =  @$_POST['w3'];
+$w4 =  @$_POST['w4'];
+$w5 =  @$_POST['w5'];
+$w6 =  @$_POST['w6'];
+
+$th1 =  @$_POST['th1'];
+$th2 =  @$_POST['th2'];
+$th3 =  @$_POST['th3'];
+$th4 =  @$_POST['th4'];
+$th5 =  @$_POST['th5'];
+$th6 =  @$_POST['th6'];
+
+$f1 =  @$_POST['f1'];
+$f2 =  @$_POST['f2'];
+$f3 =  @$_POST['f3'];
+$f4 =  @$_POST['f4'];
+$f5 =  @$_POST['f5'];
+$f6 =  @$_POST['f6'];
+
+$date_added = date('d/m/y');
+$name= $f_name .' '.$l_name;
+ 
+ $sumbit= mysql_query("INSERT into lessonplans VALUES('','$name','$subject', '$grade','$date_added','no', '$m1','$m2','$m3','$m4','$m5','$m6','$tu1','$tu2','$tu3','$tu4','$tu5','$tu6','$w1','$w2','$w3','$w4','$w5','$w6','$th1','$th2','$th3','$th4','$th5','$th6','$f1','$f2','$f3','$f4','$f5','$f6')") or die (mysql_error());
+
+  echo ' <div class="alert alert-dismissible alert-success">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <strong>You have successfuly submitted your lesson plan</strong> 
+</div></form>
+  </div>
+';
+  }
+}
+
+
+?>
+
+
+</td></tr>
+</table>
+
+</div>
+
